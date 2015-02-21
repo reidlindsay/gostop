@@ -1,9 +1,11 @@
 import random
 
-from card import Card, ALL_CARDS
+from .card import Card, ALL_CARDS
 
 
 class Deck(list):
-    def __init__(self):
-        super(Deck, self).__init__(ALL_CARDS)
+    def __init__(self, cards=ALL_CARDS):
+        super(Deck, self).__init__(cards)
+
+    def shuffle(self):
         random.shuffle(self)

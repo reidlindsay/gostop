@@ -1,7 +1,7 @@
 from collections import defaultdict, Counter
 import sys
 
-from card import *
+from .card import *
 
 
 class CardList(object):
@@ -53,7 +53,7 @@ class Hand(CardList):
         self.scores = []
         self.month_cards = self.split_by_month()
 
-        month_count = Counter(map(len, self.month_cards.itervalues()))
+        month_count = Counter(map(len, self.month_cards.values()))
         if month_count[3] > 0:
             self.scores.append(('Three cards of a month', month_count[3]))
         if month_count[4] > 0:

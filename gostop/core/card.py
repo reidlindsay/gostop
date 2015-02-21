@@ -1,4 +1,4 @@
-from utils import _
+from .utils import _
 
 
 class Card(object):
