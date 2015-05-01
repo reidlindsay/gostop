@@ -1,6 +1,6 @@
 import random
 
-from .card import Card, ALL_CARDS
+from .card import ALL_CARDS
 
 
 class Deck(list):
