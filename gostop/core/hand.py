@@ -20,12 +20,32 @@ class CardList(object):
             __class__=self.__class__,
             _cards_str=", ".join(repr(card) for card in self.cards))
 
+    def __getitem__(self, index):
+        return self.cards[index]
+
     def __iadd__(self, card):
         self.cards.append(card)
         return self
 
+    def __add__(self, other):
+        if isinstance(other, list):
+            return self.__class__(self.cards + other)
+        else:
+            return self.__class__(self.cards + other.cards)
+
     def __len__(self):
         return len(self.cards)
+
+    def __eq__(self, other):
+        if not self.cards == other.cards:
+            return False
+        return True
+
+    def __iter__(self):
+        return iter(self.cards)
+
+    def remove(self, card):
+        self.cards.remove(card)
 
     def pop(self):
         return self.cards.pop()
@@ -149,7 +169,7 @@ class TableCards(CardList):
         paired_cards = []
         for match_card in self.cards:
             if match_card.month == card.month:
-                self.cards.remove(match_card)
+                #self.cards.remove(match_card)
                 paired_cards.append(match_card)
 
         return paired_cards
