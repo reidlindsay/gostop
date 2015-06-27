@@ -41,6 +41,9 @@ class CardList(object):
             return False
         return True
 
+    def __hash__(self):
+        return hash(tuple(self.cards))
+
     def __iter__(self):
         return iter(self.cards)
 
@@ -169,7 +172,6 @@ class TableCards(CardList):
         paired_cards = []
         for match_card in self.cards:
             if match_card.month == card.month:
-                #self.cards.remove(match_card)
                 paired_cards.append(match_card)
 
         return paired_cards

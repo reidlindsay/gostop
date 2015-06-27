@@ -15,8 +15,11 @@ class Card(object):
         return self.name
 
     def __eq__(self, other):
-        return self.month == other.month and \
-            self.group == other.group
+        if other is None:
+            return False
+        else:
+            return self.month == other.month and \
+                   self.group == other.group
 
     def __hash__(self):
         return hash(self.month) ^ hash(self.group)
