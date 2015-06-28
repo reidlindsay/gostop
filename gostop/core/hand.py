@@ -37,12 +37,15 @@ class CardList(object):
         return len(self.cards)
 
     def __eq__(self, other):
-        if not self.cards == other.cards:
+        if other is None:
             return False
-        return True
+        elif isinstance(other, self.__class__):
+            return set(self.cards) == set(other.cards) and \
+                   len(self.cards) == len(other.cards)
+        return NotImplemented
 
     def __hash__(self):
-        return hash(tuple(self.cards))
+        return hash(tuple(sorted(self.cards)))
 
     def __iter__(self):
         return iter(self.cards)

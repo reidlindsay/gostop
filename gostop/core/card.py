@@ -17,9 +17,15 @@ class Card(object):
     def __eq__(self, other):
         if other is None:
             return False
-        else:
+        elif isinstance(other, self.__class__):
             return self.month == other.month and \
                    self.group == other.group
+        return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.group < other.group
+        return NotImplemented
 
     def __hash__(self):
         return hash(self.month) ^ hash(self.group)

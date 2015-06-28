@@ -22,6 +22,16 @@ class CardListTest(unittest.TestCase):
 
         self.assertEqual(len(cards), 0)
 
+    def test_equal(self):
+        h1 = CardList(CRANE, PINE_RED_POEM, PINE, PINE)
+        h2 = CardList(PINE_RED_POEM, PINE, CRANE, PINE)
+        self.assertEqual(h1, h2)
+
+    def test_hash(self):
+        h1 = CardList(CRANE, PINE_RED_POEM, PINE, PINE)
+        h2 = CardList(PINE_RED_POEM, PINE, CRANE, PINE)
+        self.assertEqual(hash(h1), hash(h2))
+
     def test_split_by_month(self):
         cards = CardList(CRANE, CURTAIN, MOON, PHOENIX, RAIN, SWALLOW)
         month_cards = cards.split_by_month()
