@@ -165,10 +165,10 @@ class GameStatePlay(GameState):
         for card in self.player_hands[self.current_player]:
             paired_cards = self.table_cards.get_paired_cards(card)
             if paired_cards == []:
-                possible_actions.append((card, None))
+                possible_actions.append(GameActionPlayCard(card))
             else:
                 for paired_card in paired_cards:
-                    possible_actions.append((card, paired_card))
+                    possible_actions.append(GameActionPlayCard(card, paired_card))
         return possible_actions
 
     def generate_successor(self, action):
@@ -178,6 +178,54 @@ class GameStatePlay(GameState):
         state.paired_cards = action
         state.top_card = state.deck.pop()
         return state
+
+
+class GameAction(object):
+    pass
+
+
+class GameActionPlayCard(GameAction):
+    def __init__(self, card, paired_card=None):
+        super().__init__()
+        self.card = card
+        self.paired_card = paired_card
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        else:
+            return self.card == other.card and \
+                   self.paired_card == other.paired_card
+
+    def __str__(self):
+        out = 'Play '
+        if self.paired_card:
+            out += '({}, {})'.format(str(self.card), str(self.paired_card))
+        else:
+            out += '{}'.format(str(self.card))
+        return out
+
+
+class GameActionGo(GameAction):
+    def __eq__(self, other):
+        if isinstance(other, GameActionGo):
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        return 'Go'
+
+
+class GameActionStop(GameAction):
+    def __eq__(self, other):
+        if isinstance(other, GameActionStop):
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        return 'Stop'
 
 
 class GameStateCapture(GameState):
