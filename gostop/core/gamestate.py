@@ -186,7 +186,7 @@ class GameAction(object):
 
 class GameActionPlayCard(GameAction):
     def __init__(self, card, paired_card=None):
-        super().__init__()
+        super(GameActionPlayCard, self).__init__()
         self.card = card
         self.paired_card = paired_card
 
