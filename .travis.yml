@@ -10,6 +10,6 @@ install:
   - python -c "import sys; sys.exit(int(sys.version_info < (3, 2)));" || pip install future
   - pip install coveralls
 script:
-  - coverage run -m unittest discover tests
+  - coverage run --source=gostop -m unittest discover tests
 after_success:
   - coveralls
