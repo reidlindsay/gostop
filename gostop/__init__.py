@@ -7,4 +7,3 @@ from .core.gamestate import GameState, GameStatePlay
 
 from .core.humanagent import HumanAgent
 from .core.randomagent import RandomAgent
-#from .core.ismctsagent import ISMCTSAgent

@@ -30,7 +30,7 @@ class GameState(object):
             self.deck = Deck()
             self.table_cards = TableCards()
             self.player_hands = \
-                [Hand() for i in range(0, self.number_of_players)]
+            [Hand() for i in range(0, self.number_of_players)]
             self.taken_cards = \
                 [TakenCards() for i in range(0, self.number_of_players)]
 
@@ -93,10 +93,10 @@ class GameState(object):
         # The observer can see his own hand, the cards on the table, and any
         # cards captured by other players
         seen_cards = [card for card in state.player_hands[observer]] + \
-                [card for card in state.table_cards] + \
-                [card for tc in state.taken_cards for card in tc]
+                     [card for card in state.table_cards] + \
+                     [card for tc in state.taken_cards for card in tc]
         unseen_cards = [card for card in Deck()
-                        if not card in seen_cards or seen_cards.remove(card)]
+                        if card not in seen_cards or seen_cards.remove(card)]
 
         # Randomly deal the unseen cards to the other players
         random.shuffle(unseen_cards)
@@ -111,31 +111,11 @@ class GameState(object):
     def get_result(self, player):
         if self.winner == player:
             return 1
-        elif self.winner != None:
+        elif self.winner is not None:
             return 0
         elif self.get_possible_actions() == []:
             return 0.5
-        print(self.get_possible_actions())
         return 0
-        """
-        player_score = 0
-        opp_score = 0
-        for p in range(self.number_of_players):
-            total_score = 0
-            print(self.taken_cards[p].score)
-            for item, s in self.taken_cards[p].score:
-                total_score += s
-            if p == player:
-                player_score = total_score
-            else:
-                opp_score = total_score
-        print(player_score, opp_score)
-        if opp_score >= 5:
-            return 0
-        elif player_score >= 5:
-            return 1
-        return 0
-        """
 
     def get_possible_actions(self):
         """Returns a list of possible actions for the current agent."""
@@ -175,6 +155,18 @@ class GameStatePlay(GameState):
         """Returns the successor state after the current agent takes `action`.
         """
         state = GameStateCapture(prev_state=self)
+
+        if action is not None:
+            # Remove the played card from the player's hand
+            state.player_hands[state.current_player].remove(action.card)
+
+            if action.paired_card is not None:
+                # Remove paired card from the table
+                state.table_cards.remove(action.paired_card)
+            else:
+                # No match; add the card to the table
+                state.table_cards += action.card
+
         state.paired_cards = action
         state.top_card = state.deck.pop()
         return state
@@ -198,11 +190,10 @@ class GameActionPlayCard(GameAction):
                    self.paired_card == other.paired_card
 
     def __str__(self):
-        out = 'Play '
         if self.paired_card:
-            out += '({}, {})'.format(str(self.card), str(self.paired_card))
+            out = '{}, {}'.format(str(self.card), str(self.paired_card))
         else:
-            out += '{}'.format(str(self.card))
+            out = '{}'.format(str(self.card))
         return out
 
 
@@ -246,10 +237,10 @@ class GameStateCapture(GameState):
         # The observer can see his own hand, the cards on the table, and any
         # cards captured by other players
         seen_cards = [card for card in state.player_hands[observer]] + \
-                [card for card in state.table_cards] + \
-                [card for tc in state.taken_cards for card in tc]
+                     [card for card in state.table_cards] + \
+                     [card for tc in state.taken_cards for card in tc]
         unseen_cards = [card for card in Deck()
-                        if not card in seen_cards or seen_cards.remove(card)]
+                        if card not in seen_cards or seen_cards.remove(card)]
 
         # Randomly deal the unseen cards to the other players
         random.shuffle(unseen_cards)
@@ -266,10 +257,10 @@ class GameStateCapture(GameState):
         possible_actions = []
         paired_cards = self.table_cards.get_paired_cards(self.top_card)
         if paired_cards == []:
-            possible_actions.append((self.top_card, None))
+            possible_actions.append(GameActionPlayCard(self.top_card))
         else:
             for paired_card in paired_cards:
-                possible_actions.append((self.top_card, paired_card))
+                possible_actions.append(GameActionPlayCard(self.top_card, paired_card))
         return possible_actions
 
     def generate_successor(self, action):
@@ -278,34 +269,29 @@ class GameStateCapture(GameState):
         state = GameStatePlay(prev_state=self)
 
         # Capture from last turn
-        if action == None:
-            print(self)
+        if action is None:
             raise GameStateException("No action from this turn")
-        if self.paired_cards == None:
-            print(self)
+        if self.paired_cards is None:
             raise GameStateException("No action from last turn")
-
-        # Remove the played card from the player's hand
-        state.player_hands[state.current_player].remove(self.paired_cards[0])
 
         # If the card is paired with one from the table, add cards to captures
         # Otherwise just add the played card to the table
-        if self.paired_cards[1] != None:
-            self.table_cards.remove(self.paired_cards[1])
-            state.taken_cards[state.current_player] += self.paired_cards[0]
-            state.taken_cards[state.current_player] += self.paired_cards[1]
-        else:
-            state.table_cards += self.paired_cards[0]
+        if self.paired_cards.paired_card is not None:
+            state.taken_cards[state.current_player] += self.paired_cards.card
+            state.taken_cards[state.current_player] += self.paired_cards.paired_card
 
         # Deck card and table cards
-        if action != None:
-            if action[1] != None:
+        if action is not None:
+            if action.paired_card is not None:
+                # Remove paired card from the table
+                state.table_cards.remove(action.paired_card)
+
                 # Add matching cards to captures
-                state.taken_cards[state.current_player] += action[0]
-                state.taken_cards[state.current_player] += action[1]
+                state.taken_cards[state.current_player] += action.card
+                state.taken_cards[state.current_player] += action.paired_card
             else:
-                # No match; add the card to the table
-                state.table_cards += action[0]
+                # Add the card to the table
+                state.table_cards += action.card
 
         total_score = 0
         for i, s in state.taken_cards[state.current_player].score:
@@ -321,12 +307,15 @@ class GameStateCapture(GameState):
 class GameStateGoStop(GameState):
     def get_possible_actions(self):
         """Returns a list of possible actions for the current agent."""
-        return ['Go', 'Stop']
+        if len(self.deck) > 0:
+            return [GameActionGo(), GameActionStop()]
+        else:
+            return [GameActionStop()]
 
     def generate_successor(self, action):
         """Returns the successor state after the current agent takes `action`.
         """
-        if action == 'Go':
+        if type(action) == GameActionGo:
             state = GameStatePlay(prev_state=self)
             state.current_player = (state.current_player+1) % state.number_of_players
         else:
