@@ -1,26 +1,24 @@
+import collections
+
 from .utils import _
 
 
-class Card(object):
-    def __init__(self, name, month, group):
-        self.name = name
-        self.month = month
-        self.group = group
+CardBase = collections.namedtuple('CardBase', ['name', 'month', 'group'])
 
-    def __repr__(self):
-        return "{__class__.__name__}(name='{name}', month={month}, group={group})" \
-            .format(__class__=self.__class__, **self.__dict__)
 
+class Card(CardBase):
     def __str__(self):
         return self.name
 
     def __eq__(self, other):
-        if other is None:
+        if not isinstance(other, type(self)):
             return False
-        elif isinstance(other, self.__class__):
-            return self.month == other.month and \
-                   self.group == other.group
-        return NotImplemented
+
+        return (self.month == other.month
+                and self.group == other.group)
+
+    def __ne__(self, other):
+        return not self == other
 
     def __lt__(self, other):
         if isinstance(other, self.__class__):
@@ -28,7 +26,7 @@ class Card(object):
         return NotImplemented
 
     def __hash__(self):
-        return hash(self.month) ^ hash(self.group)
+        return hash((self.month, self.group))
 
 
 class Month(object):
