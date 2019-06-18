@@ -7,6 +7,9 @@ gostop
 .. image:: https://coveralls.io/repos/reidlindsay/gostop/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/reidlindsay/gostop?branch=master
 
+.. image:: https://img.shields.io/badge/python-3.6%2C%203.7-brightgreen.svg
+    :target: https://www.python.org
+
 Introduction
 ------------
 
